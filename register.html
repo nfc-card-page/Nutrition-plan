@@ -319,12 +319,7 @@
                     timestamp: new Date().toISOString()
                 };
                 
-                // Save to local storage as backup
-                var users = JSON.parse(localStorage.getItem('users') || '[]');
-                users.push(userData);
-                localStorage.setItem('users', JSON.stringify(users));
-                
-                // Send to cloud storage
+                // Send to cloud storage only
                 sendDataToCloud(userData);
                 
                 document.getElementById('successMessage').style.display = 'block';
@@ -369,10 +364,7 @@
                 })
                 .catch(error => {
                     console.error('Error saving to cloud:', error);
-                    // Fallback to local storage
-                    var adminData = JSON.parse(localStorage.getItem('adminData') || '[]');
-                    adminData.push(userData);
-                    localStorage.setItem('adminData', JSON.stringify(adminData));
+                    alert('خطا در ذخیره اطلاعات. لطفاً دوباره تلاش کنید.');
                 });
             }
         })();
