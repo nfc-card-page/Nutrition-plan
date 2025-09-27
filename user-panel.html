@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل کاربری</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #2196F3;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 2rem;
+            padding: 0.5rem 1rem;
+            background: #f0f0f0;
+            color: #333;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        
+        .back-btn:hover {
+            background: #e0e0e0;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        .diet-plan {
+            display: none;
+            margin-top: 2rem;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .diet-plan h2 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        
+        .diet-item {
+            background: white;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .diet-item h3 {
+            color: #4CAF50;
+            margin-bottom: 0.5rem;
+        }
+        
+        .diet-item p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .no-plan {
+            text-align: center;
+            color: #666;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-btn">← بازگشت به صفحه اصلی</a>
+        <h1>پنل کاربری</h1>
+        
+        <div class="error-message" id="errorMessage">
+            نام کاربری یا رمز عبور اشتباه است
+        </div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">نام کاربری:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">رمز ۴ رقمی:</label>
+                <input type="password" id="password" name="password" maxlength="4" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">ورود</button>
+        </form>
+        
+        <div class="diet-plan" id="dietPlan">
+            <h2>برنامه غذایی شما</h2>
+            <div id="dietContent">
+                <!-- Diet plan content will be loaded here -->
+            </div>
+        </div>
+        
+        <div class="no-plan" id="noPlan" style="display: none;">
+            <h3>برنامه غذایی شما هنوز آماده نشده است</h3>
+            <p>لطفاً بعداً مراجعه کنید</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Get users from localStorage
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const user = users.find(u => u.username === username && u.password === password);
+            
+            if (user) {
+                // Hide login form and error message
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('errorMessage').style.display = 'none';
+                
+                // Load diet plan
+                loadDietPlan(user.username);
+            } else {
+                document.getElementById('errorMessage').style.display = 'block';
+            }
+        });
+        
+        function loadDietPlan(username) {
+            // دریافت برنامه غذایی از سایت دوم
+            const dietPlans = JSON.parse(localStorage.getItem('adminDietPlans') || '{}');
+            const dietPlan = dietPlans[username];
+            
+            if (dietPlan && dietPlan.length > 0) {
+                document.getElementById('dietPlan').style.display = 'block';
+                document.getElementById('noPlan').style.display = 'none';
+                
+                const dietContent = document.getElementById('dietContent');
+                dietContent.innerHTML = dietPlan.map(item => `
+                    <div class="diet-item">
+                        <h3>${item.title}</h3>
+                        <p>${item.description}</p>
+                    </div>
+                `).join('');
+            } else {
+                document.getElementById('noPlan').style.display = 'block';
+                document.getElementById('dietPlan').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
