@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -13,27 +14,52 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+         
+            background-image: url("5.jpg");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+        }
+        
+        /* لایه تیره برای بهتر دیده شدن متن */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 1;
         }
         
         .container {
-            background: white;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 3rem;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
             max-width: 500px;
             width: 90%;
+            position: relative;
+            z-index: 2;
         }
         
         h1 {
             text-align: center;
-            color: #333;
+            color: #fff;
             margin-bottom: 2rem;
             font-size: 2.5rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            font-weight: 700;
         }
         
         .form-group {
@@ -43,22 +69,33 @@
         label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #333;
+            color: #fff;
             font-weight: bold;
+            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
         }
         
         input {
             width: 100%;
             padding: 1rem;
-            border: 2px solid #ddd;
-            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
             font-size: 1rem;
-            transition: border-color 0.3s ease;
+            transition: all 0.3s ease;
+            color: #fff;
+        }
+        
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
         }
         
         input:focus {
             outline: none;
-            border-color: #2196F3;
+            border-color: rgba(33, 150, 243, 0.8);
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 20px rgba(33, 150, 243, 0.3);
         }
         
         .btn {
@@ -66,84 +103,141 @@
             padding: 1rem;
             font-size: 1.2rem;
             border: none;
-            border-radius: 10px;
+            border-radius: 15px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
             font-weight: bold;
+            position: relative;
+            overflow: hidden;
         }
         
         .btn-primary {
-            background: linear-gradient(45deg, #2196F3, #1976D2);
+            background: rgba(33, 150, 243, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
         
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            background: rgba(33, 150, 243, 0.9);
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
         }
         
         .back-btn {
             display: inline-block;
             margin-bottom: 2rem;
             padding: 0.5rem 1rem;
-            background: #f0f0f0;
-            color: #333;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: #fff;
             text-decoration: none;
-            border-radius: 5px;
-            transition: background 0.3s ease;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
         
         .back-btn:hover {
-            background: #e0e0e0;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
         }
         
         .error-message {
-            background: #f8d7da;
+            background: rgba(248, 215, 218, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             color: #721c24;
             padding: 1rem;
-            border-radius: 10px;
+            border-radius: 15px;
             margin-bottom: 1rem;
             display: none;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
         
         .diet-plan {
             display: none;
             margin-top: 2rem;
             padding: 2rem;
-            background: #f8f9fa;
-            border-radius: 10px;
+            background: rgba(248, 249, 250, 0.2);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
         
         .diet-plan h2 {
-            color: #333;
+            color: #fff;
             margin-bottom: 1rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
         
         .diet-item {
-            background: white;
-            padding: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 1.5rem;
             margin-bottom: 1rem;
-            border-radius: 10px;
-            border-left: 4px solid #4CAF50;
+            border-radius: 15px;
+            border-left: 4px solid rgba(76, 175, 80, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
         
         .diet-item h3 {
             color: #4CAF50;
             margin-bottom: 0.5rem;
+            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
         }
         
         .diet-item p {
-            color: #666;
+            color: rgba(255, 255, 255, 0.9);
             line-height: 1.6;
+            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
         }
         
         .no-plan {
             text-align: center;
-            color: #666;
+            color: rgba(255, 255, 255, 0.9);
             padding: 2rem;
-            background: #f8f9fa;
-            border-radius: 10px;
+            background: rgba(248, 249, 250, 0.2);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px;
             margin-top: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* انیمیشن ورود */
+        .container {
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
@@ -184,104 +278,90 @@
     </div>
 
     <script>
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        (function(){
+            var _0x1a2b=['users','adminData','dietPlan_','adminDietPlans','dietPlans','getItem','setItem','JSON','parse','stringify','find','push','filter','map','join','innerHTML','style','display','classList','add','remove','contains','hidden','value','getElementById','querySelectorAll','addEventListener','preventDefault','FormData','get','setTimeout','setInterval','console','log'];
+            var _0x2c3d=function(a,b){return _0x1a2b[a-b];};
             
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            
-            // Get users from localStorage
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
-            const user = users.find(u => u.username === username && u.password === password);
-            
-            // اگر در users پیدا نشد، از adminData جستجو کن
-            if (!user) {
-                const adminUsers = JSON.parse(localStorage.getItem('adminData') || '[]');
-                const adminUser = adminUsers.find(u => u.username === username && u.password === password);
-                if (adminUser) {
-                    // کاربر را به users اضافه کن
-                    users.push(adminUser);
-                    localStorage.setItem('users', JSON.stringify(users));
-                }
-            }
-            
-            // جستجوی نهایی کاربر
-            const finalUser = users.find(u => u.username === username && u.password === password);
-            
-            if (finalUser) {
-                // Hide login form and error message
-                document.getElementById('loginForm').style.display = 'none';
-                document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
                 
-                // Load diet plan
-                loadDietPlan(finalUser.username);
-            } else {
-                document.getElementById('errorMessage').style.display = 'block';
-            }
-        });
-        
-        function loadDietPlan(username) {
-            // دریافت برنامه غذایی از سایت دوم
-            let dietPlan = null;
-            
-            // نمایش تمام داده‌های موجود در localStorage برای debug
-            console.log('=== Debug Info ===');
-            console.log('Username:', username);
-            console.log('All localStorage keys:', Object.keys(localStorage));
-            
-            // جستجو در تمام منابع ممکن
-            const sources = [
-                { name: 'dietPlan_' + username, data: localStorage.getItem('dietPlan_' + username) },
-                { name: 'adminDietPlans', data: localStorage.getItem('adminDietPlans') },
-                { name: 'dietPlans', data: localStorage.getItem('dietPlans') }
-            ];
-            
-            for (let source of sources) {
-                console.log('Checking source:', source.name, ':', source.data);
-                if (source.data) {
-                    try {
-                        const data = JSON.parse(source.data);
-                        if (data[username]) {
-                            dietPlan = data[username];
-                            console.log('Found diet plan in', source.name, ':', dietPlan);
-                            break;
-                        } else if (Array.isArray(data)) {
-                            dietPlan = data;
-                            console.log('Found array diet plan in', source.name, ':', dietPlan);
-                            break;
-                        }
-                    } catch (e) {
-                        console.log('خطا در پارس کردن داده از', source.name, ':', e);
+                var username = document.getElementById('username').value;
+                var password = document.getElementById('password').value;
+                
+                var users = JSON.parse(localStorage.getItem('users') || '[]');
+                var user = users.find(function(u) { return u.username === username && u.password === password; });
+                
+                if (!user) {
+                    var adminUsers = JSON.parse(localStorage.getItem('adminData') || '[]');
+                    var adminUser = adminUsers.find(function(u) { return u.username === username && u.password === password; });
+                    if (adminUser) {
+                        users.push(adminUser);
+                        localStorage.setItem('users', JSON.stringify(users));
                     }
                 }
-            }
-            
-            console.log('Final diet plan for', username, ':', dietPlan);
-            
-            if (dietPlan && dietPlan.length > 0) {
-                document.getElementById('dietPlan').style.display = 'block';
-                document.getElementById('noPlan').style.display = 'none';
                 
-                const dietContent = document.getElementById('dietContent');
-                dietContent.innerHTML = dietPlan.map(item => `
-                    <div class="diet-item">
-                        <h3>${item.title}</h3>
-                        <p>${item.description}</p>
-                    </div>
-                `).join('');
-            } else {
-                document.getElementById('noPlan').style.display = 'block';
-                document.getElementById('dietPlan').style.display = 'none';
+                var finalUser = users.find(function(u) { return u.username === username && u.password === password; });
+                
+                if (finalUser) {
+                    document.getElementById('loginForm').style.display = 'none';
+                    document.getElementById('errorMessage').style.display = 'none';
+                    loadDietPlan(finalUser.username);
+                } else {
+                    document.getElementById('errorMessage').style.display = 'block';
+                }
+            });
+            
+            function loadDietPlan(username) {
+                var dietPlan = null;
+                
+                var sources = [
+                    { name: 'dietPlan_' + username, data: localStorage.getItem('dietPlan_' + username) },
+                    { name: 'adminDietPlans', data: localStorage.getItem('adminDietPlans') },
+                    { name: 'dietPlans', data: localStorage.getItem('dietPlans') }
+                ];
+                
+                for (var i = 0; i < sources.length; i++) {
+                    var source = sources[i];
+                    if (source.data) {
+                        try {
+                            var data = JSON.parse(source.data);
+                            if (data[username]) {
+                                dietPlan = data[username];
+                                break;
+                            } else if (Array.isArray(data)) {
+                                dietPlan = data;
+                                break;
+                            }
+                        } catch (e) {
+                            // Error parsing
+                        }
+                    }
+                }
+                
+                if (dietPlan && dietPlan.length > 0) {
+                    document.getElementById('dietPlan').style.display = 'block';
+                    document.getElementById('noPlan').style.display = 'none';
+                    
+                    var dietContent = document.getElementById('dietContent');
+                    dietContent.innerHTML = dietPlan.map(function(item) {
+                        return '<div class="diet-item"><h3>' + item.title + '</h3><p>' + item.description + '</p></div>';
+                    }).join('');
+                } else {
+                    document.getElementById('noPlan').style.display = 'block';
+                    document.getElementById('dietPlan').style.display = 'none';
+                }
             }
-        }
-        
-        // همگام‌سازی برنامه غذایی هر ۳ ثانیه
-        setInterval(() => {
-            const username = document.getElementById('username').value;
-            if (username) {
-                loadDietPlan(username);
-            }
-        }, 3000);
+            
+            setInterval(function() {
+                var loginForm = document.getElementById('loginForm');
+                if (loginForm.style.display === 'none') {
+                    var username = document.getElementById('username').value;
+                    if (username) {
+                        loadDietPlan(username);
+                    }
+                }
+            }, 3000);
+        })();
     </script>
 </body>
 </html>
