@@ -13,15 +13,74 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-           
+            
             background-image: url("6.jpg");
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             background-repeat: no-repeat;
             min-height: 100vh;
-            padding: 2rem 0;
+            padding: 2rem 1rem;
             position: relative;
+        }
+        
+        /* طراحی موبایل */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem 0.5rem;
+                background-attachment: scroll;
+            }
+            
+            .container {
+                width: 95% !important;
+                max-width: none !important;
+                padding: 2rem 1.5rem !important;
+                margin: 0 !important;
+            }
+            
+            h1 {
+                font-size: 2rem !important;
+                margin-bottom: 1.5rem !important;
+            }
+            
+            .form-group {
+                margin-bottom: 1rem !important;
+            }
+            
+            input, select {
+                padding: 0.8rem !important;
+                font-size: 0.9rem !important;
+            }
+            
+            .btn {
+                padding: 0.8rem !important;
+                font-size: 1rem !important;
+            }
+            
+            .back-btn {
+                padding: 0.4rem 0.8rem !important;
+                font-size: 0.9rem !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 1.5rem 1rem !important;
+            }
+            
+            h1 {
+                font-size: 1.8rem !important;
+            }
+            
+            input, select {
+                padding: 0.7rem !important;
+                font-size: 0.85rem !important;
+            }
+            
+            .btn {
+                padding: 0.7rem !important;
+                font-size: 0.9rem !important;
+            }
         }
         
         /* لایه تیره برای بهتر دیده شدن متن */
@@ -283,4 +342,3 @@
     </script>
 </body>
 </html>
-
