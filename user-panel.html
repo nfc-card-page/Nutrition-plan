@@ -373,16 +373,7 @@
             });
             
             function authenticateUser(username, password) {
-                // First try local storage
-                var users = JSON.parse(localStorage.getItem('users') || '[]');
-                var user = users.find(function(u) { return u.username === username && u.password === password; });
-                
-                if (user) {
-                    loginSuccess(user);
-                    return;
-                }
-                
-                // If not found locally, try cloud storage
+                // Try cloud storage only
                 fetch(JSONBIN_URL + '/latest', {
                     method: 'GET',
                     headers: {
@@ -397,9 +388,6 @@
                     var cloudUser = allUsers.find(function(u) { return u.username === username && u.password === password; });
                     
                     if (cloudUser) {
-                        // Save to local storage for faster access
-                        users.push(cloudUser);
-                        localStorage.setItem('users', JSON.stringify(users));
                         loginSuccess(cloudUser);
                     } else {
                         document.getElementById('errorMessage').style.display = 'block';
@@ -418,38 +406,8 @@
             }
             
             function loadDietPlan(username) {
-                // First try local storage
-                var dietPlan = null;
-                var sources = [
-                    { name: 'dietPlan_' + username, data: localStorage.getItem('dietPlan_' + username) },
-                    { name: 'adminDietPlans', data: localStorage.getItem('adminDietPlans') },
-                    { name: 'dietPlans', data: localStorage.getItem('dietPlans') }
-                ];
-                
-                for (var i = 0; i < sources.length; i++) {
-                    var source = sources[i];
-                    if (source.data) {
-                        try {
-                            var data = JSON.parse(source.data);
-                            if (data[username]) {
-                                dietPlan = data[username];
-                                break;
-                            } else if (Array.isArray(data)) {
-                                dietPlan = data;
-                                break;
-                            }
-                        } catch (e) {
-                            // Error parsing
-                        }
-                    }
-                }
-                
-                if (dietPlan && dietPlan.length > 0) {
-                    displayDietPlan(dietPlan);
-                } else {
-                    // Try to load from cloud
-                    loadDietPlanFromCloud(username);
-                }
+                // Load from cloud only
+                loadDietPlanFromCloud(username);
             }
             
             function loadDietPlanFromCloud(username) {
@@ -466,8 +424,6 @@
                     var dietPlan = cloudData.adminDietPlans[username];
                     
                     if (dietPlan && dietPlan.length > 0) {
-                        // Save to local storage
-                        localStorage.setItem('dietPlan_' + username, JSON.stringify(dietPlan));
                         displayDietPlan(dietPlan);
                     } else {
                         document.getElementById('noPlan').style.display = 'block';
