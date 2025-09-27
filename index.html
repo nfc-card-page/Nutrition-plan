@@ -24,6 +24,52 @@
             align-items: center;
             justify-content: center;
             position: relative;
+            padding: 1rem;
+        }
+        
+        /* طراحی موبایل */
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+                background-attachment: scroll;
+            }
+            
+            .container {
+                width: 95% !important;
+                max-width: none !important;
+                padding: 2rem 1.5rem !important;
+                margin: 0 !important;
+            }
+            
+            h1 {
+                font-size: 2rem !important;
+                margin-bottom: 1.5rem !important;
+            }
+            
+            .btn {
+                padding: 0.8rem 1.5rem !important;
+                font-size: 1rem !important;
+            }
+            
+            .description {
+                font-size: 0.9rem !important;
+                margin-top: 1.5rem !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 1.5rem 1rem !important;
+            }
+            
+            h1 {
+                font-size: 1.8rem !important;
+            }
+            
+            .btn {
+                padding: 0.7rem 1rem !important;
+                font-size: 0.9rem !important;
+            }
         }
         
       
@@ -183,4 +229,3 @@
     </div>
 </body>
 </html>
-
