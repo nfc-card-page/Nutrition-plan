@@ -194,13 +194,27 @@
             const users = JSON.parse(localStorage.getItem('users') || '[]');
             const user = users.find(u => u.username === username && u.password === password);
             
-            if (user) {
+            // اگر در users پیدا نشد، از adminData جستجو کن
+            if (!user) {
+                const adminUsers = JSON.parse(localStorage.getItem('adminData') || '[]');
+                const adminUser = adminUsers.find(u => u.username === username && u.password === password);
+                if (adminUser) {
+                    // کاربر را به users اضافه کن
+                    users.push(adminUser);
+                    localStorage.setItem('users', JSON.stringify(users));
+                }
+            }
+            
+            // جستجوی نهایی کاربر
+            const finalUser = users.find(u => u.username === username && u.password === password);
+            
+            if (finalUser) {
                 // Hide login form and error message
                 document.getElementById('loginForm').style.display = 'none';
                 document.getElementById('errorMessage').style.display = 'none';
                 
                 // Load diet plan
-                loadDietPlan(user.username);
+                loadDietPlan(finalUser.username);
             } else {
                 document.getElementById('errorMessage').style.display = 'block';
             }
@@ -210,15 +224,39 @@
             // دریافت برنامه غذایی از سایت دوم
             let dietPlan = null;
             
-            // ابتدا از localStorage عمومی جستجو کن
-            const generalDietPlan = localStorage.getItem('dietPlan_' + username);
-            if (generalDietPlan) {
-                dietPlan = JSON.parse(generalDietPlan);
-            } else {
-                // اگر پیدا نشد، از adminDietPlans جستجو کن
-                const dietPlans = JSON.parse(localStorage.getItem('adminDietPlans') || '{}');
-                dietPlan = dietPlans[username];
+            // نمایش تمام داده‌های موجود در localStorage برای debug
+            console.log('=== Debug Info ===');
+            console.log('Username:', username);
+            console.log('All localStorage keys:', Object.keys(localStorage));
+            
+            // جستجو در تمام منابع ممکن
+            const sources = [
+                { name: 'dietPlan_' + username, data: localStorage.getItem('dietPlan_' + username) },
+                { name: 'adminDietPlans', data: localStorage.getItem('adminDietPlans') },
+                { name: 'dietPlans', data: localStorage.getItem('dietPlans') }
+            ];
+            
+            for (let source of sources) {
+                console.log('Checking source:', source.name, ':', source.data);
+                if (source.data) {
+                    try {
+                        const data = JSON.parse(source.data);
+                        if (data[username]) {
+                            dietPlan = data[username];
+                            console.log('Found diet plan in', source.name, ':', dietPlan);
+                            break;
+                        } else if (Array.isArray(data)) {
+                            dietPlan = data;
+                            console.log('Found array diet plan in', source.name, ':', dietPlan);
+                            break;
+                        }
+                    } catch (e) {
+                        console.log('خطا در پارس کردن داده از', source.name, ':', e);
+                    }
+                }
             }
+            
+            console.log('Final diet plan for', username, ':', dietPlan);
             
             if (dietPlan && dietPlan.length > 0) {
                 document.getElementById('dietPlan').style.display = 'block';
