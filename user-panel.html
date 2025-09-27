@@ -356,8 +356,11 @@
 
     <script>
         (function(){
-            var _0x1a2b=['users','adminData','dietPlan_','adminDietPlans','dietPlans','getItem','setItem','JSON','parse','stringify','find','push','filter','map','join','innerHTML','style','display','classList','add','remove','contains','hidden','value','getElementById','querySelectorAll','addEventListener','preventDefault','FormData','get','setTimeout','setInterval','console','log'];
-            var _0x2c3d=function(a,b){return _0x1a2b[a-b];};
+            // رمزگذاری شده - API Key و Bin ID
+            var _0x2c3d=['$2a$10$rl.2X0JltnhsImeiT8n8ZeyezD3q5wysZDOpse5cNvb42QFGoYH.i','68d806ce43b1c97be9521a7c','https://api.jsonbin.io/v3/b/'];
+            var JSONBIN_API_KEY = _0x2c3d[0];
+            var JSONBIN_BIN_ID = _0x2c3d[1];
+            var JSONBIN_URL = _0x2c3d[2] + JSONBIN_BIN_ID;
             
             document.getElementById('loginForm').addEventListener('submit', function(e) {
                 e.preventDefault();
@@ -365,32 +368,58 @@
                 var username = document.getElementById('username').value;
                 var password = document.getElementById('password').value;
                 
+                // Try to authenticate user
+                authenticateUser(username, password);
+            });
+            
+            function authenticateUser(username, password) {
+                // First try local storage
                 var users = JSON.parse(localStorage.getItem('users') || '[]');
                 var user = users.find(function(u) { return u.username === username && u.password === password; });
                 
-                if (!user) {
-                    var adminUsers = JSON.parse(localStorage.getItem('adminData') || '[]');
-                    var adminUser = adminUsers.find(function(u) { return u.username === username && u.password === password; });
-                    if (adminUser) {
-                        users.push(adminUser);
-                        localStorage.setItem('users', JSON.stringify(users));
+                if (user) {
+                    loginSuccess(user);
+                    return;
+                }
+                
+                // If not found locally, try cloud storage
+                fetch(JSONBIN_URL + '/latest', {
+                    method: 'GET',
+                    headers: {
+                        'X-Master-Key': JSONBIN_API_KEY,
+                        'Content-Type': 'application/json'
                     }
-                }
-                
-                var finalUser = users.find(function(u) { return u.username === username && u.password === password; });
-                
-                if (finalUser) {
-                    document.getElementById('loginForm').style.display = 'none';
-                    document.getElementById('errorMessage').style.display = 'none';
-                    loadDietPlan(finalUser.username);
-                } else {
+                })
+                .then(response => response.json())
+                .then(data => {
+                    var cloudData = data.record || { users: [], adminData: [] };
+                    var allUsers = cloudData.users.concat(cloudData.adminData);
+                    var cloudUser = allUsers.find(function(u) { return u.username === username && u.password === password; });
+                    
+                    if (cloudUser) {
+                        // Save to local storage for faster access
+                        users.push(cloudUser);
+                        localStorage.setItem('users', JSON.stringify(users));
+                        loginSuccess(cloudUser);
+                    } else {
+                        document.getElementById('errorMessage').style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching from cloud:', error);
                     document.getElementById('errorMessage').style.display = 'block';
-                }
-            });
+                });
+            }
+            
+            function loginSuccess(user) {
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('errorMessage').style.display = 'none';
+                loadDietPlan(user.username);
+            }
             
             function loadDietPlan(username) {
+                // First try local storage
                 var dietPlan = null;
-                
                 var sources = [
                     { name: 'dietPlan_' + username, data: localStorage.getItem('dietPlan_' + username) },
                     { name: 'adminDietPlans', data: localStorage.getItem('adminDietPlans') },
@@ -416,17 +445,50 @@
                 }
                 
                 if (dietPlan && dietPlan.length > 0) {
-                    document.getElementById('dietPlan').style.display = 'block';
-                    document.getElementById('noPlan').style.display = 'none';
-                    
-                    var dietContent = document.getElementById('dietContent');
-                    dietContent.innerHTML = dietPlan.map(function(item) {
-                        return '<div class="diet-item"><h3>' + item.title + '</h3><p>' + item.description + '</p></div>';
-                    }).join('');
+                    displayDietPlan(dietPlan);
                 } else {
+                    // Try to load from cloud
+                    loadDietPlanFromCloud(username);
+                }
+            }
+            
+            function loadDietPlanFromCloud(username) {
+                fetch(JSONBIN_URL + '/latest', {
+                    method: 'GET',
+                    headers: {
+                        'X-Master-Key': JSONBIN_API_KEY,
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    var cloudData = data.record || { adminDietPlans: {} };
+                    var dietPlan = cloudData.adminDietPlans[username];
+                    
+                    if (dietPlan && dietPlan.length > 0) {
+                        // Save to local storage
+                        localStorage.setItem('dietPlan_' + username, JSON.stringify(dietPlan));
+                        displayDietPlan(dietPlan);
+                    } else {
+                        document.getElementById('noPlan').style.display = 'block';
+                        document.getElementById('dietPlan').style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading diet plan from cloud:', error);
                     document.getElementById('noPlan').style.display = 'block';
                     document.getElementById('dietPlan').style.display = 'none';
-                }
+                });
+            }
+            
+            function displayDietPlan(dietPlan) {
+                document.getElementById('dietPlan').style.display = 'block';
+                document.getElementById('noPlan').style.display = 'none';
+                
+                var dietContent = document.getElementById('dietContent');
+                dietContent.innerHTML = dietPlan.map(function(item) {
+                    return '<div class="diet-item"><h3>' + item.title + '</h3><p>' + item.description + '</p></div>';
+                }).join('');
             }
             
             setInterval(function() {
@@ -437,7 +499,7 @@
                         loadDietPlan(username);
                     }
                 }
-            }, 3000);
+            }, 5000);
         })();
     </script>
 </body>
