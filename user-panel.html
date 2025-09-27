@@ -208,8 +208,17 @@
         
         function loadDietPlan(username) {
             // دریافت برنامه غذایی از سایت دوم
-            const dietPlans = JSON.parse(localStorage.getItem('adminDietPlans') || '{}');
-            const dietPlan = dietPlans[username];
+            let dietPlan = null;
+            
+            // ابتدا از localStorage عمومی جستجو کن
+            const generalDietPlan = localStorage.getItem('dietPlan_' + username);
+            if (generalDietPlan) {
+                dietPlan = JSON.parse(generalDietPlan);
+            } else {
+                // اگر پیدا نشد، از adminDietPlans جستجو کن
+                const dietPlans = JSON.parse(localStorage.getItem('adminDietPlans') || '{}');
+                dietPlan = dietPlans[username];
+            }
             
             if (dietPlan && dietPlan.length > 0) {
                 document.getElementById('dietPlan').style.display = 'block';
@@ -227,6 +236,14 @@
                 document.getElementById('dietPlan').style.display = 'none';
             }
         }
+        
+        // همگام‌سازی برنامه غذایی هر ۳ ثانیه
+        setInterval(() => {
+            const username = document.getElementById('username').value;
+            if (username) {
+                loadDietPlan(username);
+            }
+        }, 3000);
     </script>
 </body>
 </html>
