@@ -298,58 +298,44 @@
     </div>
 
     <script>
-        (function(){
-            // Cloudflare Workers API endpoint
-            var CLOUDFLARE_API_URL = 'https://user-data-api.clad90093.workers.dev/';
+        const API_URL = 'https://user-data-api.clad90093.workers.dev/';
+        
+        document.getElementById('userForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
             
-            document.getElementById('userForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                var formData = new FormData(this);
-                var userData = {
-                    username: formData.get('username'),
-                    password: formData.get('password'),
-                    age: parseInt(formData.get('age')),
-                    gender: formData.get('gender'),
-                    height: parseInt(formData.get('height')),
-                    weight: parseFloat(formData.get('weight')),
-                    timestamp: new Date().toISOString()
-                };
-                
-                // Send to Cloudflare Workers
-                sendDataToCloudflare(userData);
-            });
+            const formData = new FormData(this);
+            const userData = {
+                username: formData.get('username'),
+                password: formData.get('password'),
+                age: parseInt(formData.get('age')),
+                gender: formData.get('gender'),
+                height: parseInt(formData.get('height')),
+                weight: parseFloat(formData.get('weight')),
+                timestamp: new Date().toISOString()
+            };
             
-            function sendDataToCloudflare(userData) {
-                fetch(CLOUDFLARE_API_URL, {
+            try {
+                const response = await fetch(API_URL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'create_user',
-                        data: userData
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById('successMessage').style.display = 'block';
-                        document.getElementById('userForm').reset();
-                        
-                        setTimeout(function() {
-                            document.getElementById('successMessage').style.display = 'none';
-                        }, 3000);
-                    } else {
-                        alert('خطا در ثبت اطلاعات: ' + (data.error || 'خطای نامشخص'));
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('خطا در اتصال به سرور');
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
                 });
+                
+                const result = await response.json();
+                if (result.success) {
+                    document.getElementById('successMessage').style.display = 'block';
+                    this.reset();
+                    setTimeout(() => {
+                        document.getElementById('successMessage').style.display = 'none';
+                    }, 3000);
+                } else {
+                    alert('خطا در ثبت اطلاعات: ' + (result.error || 'خطای نامشخص'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('خطا در اتصال به سرور');
             }
-        })();
+        });
     </script>
 </body>
 </html>
