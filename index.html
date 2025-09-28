@@ -1,64 +1,231 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <title>ثبت نام کاربر</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> سیستم مدیریت کاربران</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+           
+            background-image: url("6.jpg");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 1rem;
+        }
+        
+        /* طراحی موبایل */
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+                background-attachment: scroll;
+            }
+            
+            .container {
+                width: 95% !important;
+                max-width: none !important;
+                padding: 2rem 1.5rem !important;
+                margin: 0 !important;
+            }
+            
+            h1 {
+                font-size: 2rem !important;
+                margin-bottom: 1.5rem !important;
+            }
+            
+            .btn {
+                padding: 0.8rem 1.5rem !important;
+                font-size: 1rem !important;
+            }
+            
+            .description {
+                font-size: 0.9rem !important;
+                margin-top: 1.5rem !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 1.5rem 1rem !important;
+            }
+            
+            h1 {
+                font-size: 1.8rem !important;
+            }
+            
+            .btn {
+                padding: 0.7rem 1rem !important;
+                font-size: 0.9rem !important;
+            }
+        }
+        
+      
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 1;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 3rem;
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            z-index: 2;
+        }
+        
+        h1 {
+            color: #fff;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            font-weight: 700;
+        }
+        
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .btn {
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: bold;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary {
+            background: rgba(76, 175, 80, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(33, 150, 243, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .description {
+            margin-top: 2rem;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
+            font-size: 1.1rem;
+        }
+        
+        .description p {
+            margin-bottom: 0.5rem;
+        }
+        
+        /* انیمیشن ورود */
+        .container {
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* انیمیشن دکمه‌ها */
+        .btn {
+            animation: slideInLeft 0.8s ease-out;
+        }
+        
+        .btn:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
 </head>
 <body>
-  <h1>ثبت اطلاعات کاربر</h1>
-  <form id="userForm">
-    <label>نام کاربری: <input type="text" name="username" required></label><br>
-    <label>سن: <input type="number" name="age" required></label><br>
-    <label>جنسیت:
-      <select name="gender" required>
-        <option value="male">مرد</option>
-        <option value="female">زن</option>
-      </select>
-    </label><br>
-    <label>قد: <input type="number" name="height" required></label><br>
-    <label>وزن: <input type="number" name="weight" required></label><br>
-    <button type="submit">ثبت</button>
-  </form>
-
-  <h2>لیست کاربران</h2>
-  <pre id="usersList"></pre>
-
-  <script>
-    const API_URL = 'https://user-data-api.clad90093.workers.dev/'; 
-    const ADMIN_PASSWORD = '1491';
-
-    const form = document.getElementById('userForm');
-    const usersList = document.getElementById('usersList');
-
-    async function loadUsers() {
-      const response = await fetch(`${API_URL}?password=${ADMIN_PASSWORD}`);
-      const result = await response.json();
-      if (result.success) {
-        usersList.textContent = JSON.stringify(result.data, null, 2);
-      } else {
-        usersList.textContent = 'خطا در بارگذاری داده‌ها';
-      }
-    }
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const data = Object.fromEntries(new FormData(form).entries());
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      const result = await response.json();
-      if (result.success) {
-        alert('اطلاعات با موفقیت ثبت شد');
-        form.reset();
-        loadUsers();
-      } else {
-        alert('خطا در ثبت اطلاعات');
-      }
-    });
-
-    loadUsers();
-  </script>
+    <div class="container">
+        <h1>سیستم مدیریت کاربران</h1>
+        <div class="button-container">
+            <a href="register.html" class="btn btn-primary">ثبت و ارسال اطلاعات</a>
+            <a href="user-panel.html" class="btn btn-secondary">پنل کاربری</a>
+        </div>
+        <div class="description">
+            <p>برای ثبت اطلاعات جدید روی دکمه اول کلیک کنید</p>
+            <p>برای ورود به پنل کاربری روی دکمه دوم کلیک کنید</p>
+        </div>
+    </div>
 </body>
 </html>
