@@ -1,165 +1,64 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>ثبت و ارسال اطلاعات (با JSON در کد)</title>
-<style>
-  body{font-family: Tahoma, sans-serif; padding:2rem; background:#f4f6fb}
-  .card{max-width:600px;margin:0 auto;background:white;padding:1.5rem;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.08)}
-  label{display:block;margin-bottom:.3rem}
-  input,select{width:100%;padding:.6rem;margin-bottom:1rem;border:1px solid #ddd;border-radius:6px}
-  button{padding:.7rem 1rem;border:none;background:#28a745;color:white;border-radius:6px;cursor:pointer}
-</style>
+  <meta charset="UTF-8">
+  <title>ثبت نام کاربر</title>
 </head>
 <body>
-  <div class="card">
-    <h2>ثبت و ارسال اطلاعات</h2>
-
-    <form id="registerForm">
-      <label>نام کاربری</label>
-      <input id="username" required>
-
-      <label>رمز ۴ رقمی</label>
-      <input id="password" pattern="\d{4}" maxlength="4" required placeholder="مثلاً 1234">
-
-      <label>سن</label>
-      <input id="age" type="number" min="1" max="120" required>
-
-      <label>جنسیت</label>
-      <select id="gender" required>
-        <option value="">انتخاب کنید</option>
+  <h1>ثبت اطلاعات کاربر</h1>
+  <form id="userForm">
+    <label>نام کاربری: <input type="text" name="username" required></label><br>
+    <label>سن: <input type="number" name="age" required></label><br>
+    <label>جنسیت:
+      <select name="gender" required>
         <option value="male">مرد</option>
         <option value="female">زن</option>
       </select>
+    </label><br>
+    <label>قد: <input type="number" name="height" required></label><br>
+    <label>وزن: <input type="number" name="weight" required></label><br>
+    <button type="submit">ثبت</button>
+  </form>
 
-      <label>قد (سانتی‌متر)</label>
-      <input id="height" type="number" min="100" max="250" required>
+  <h2>لیست کاربران</h2>
+  <pre id="usersList"></pre>
 
-      <label>وزن (کیلوگرم)</label>
-      <input id="weight" type="number" step="0.1" min="20" max="300" required>
+  <script>
+    const API_URL = 'https://user-data-api.clad90093.workers.dev/'; 
+    const ADMIN_PASSWORD = '1491';
 
-      <button type="submit">ثبت و ارسال</button>
-    </form>
+    const form = document.getElementById('userForm');
+    const usersList = document.getElementById('usersList');
 
-    <p id="status" style="margin-top:1rem;color:#333"></p>
-  </div>
+    async function loadUsers() {
+      const response = await fetch(`${API_URL}?password=${ADMIN_PASSWORD}`);
+      const result = await response.json();
+      if (result.success) {
+        usersList.textContent = JSON.stringify(result.data, null, 2);
+      } else {
+        usersList.textContent = 'خطا در بارگذاری داده‌ها';
+      }
+    }
 
-<script>
-/*
-  EMBEDDED JSON (دادهٔ اولیه تعبیه‌شده در کد)
-  می‌تونی اینجا چند کاربر تست هم قرار بدی، یا خالی بذاری.
-  بعداً این بخش را اگر خواستی رمزگذاری / obfuscate کن.
-*/
-const EMBEDDED_BIN = {
-  users: [
-    // مثال دادهٔ تست (در صورت نیاز حذف کن)
-    // { username: "ali", password: "1234", age: "30", gender: "male", height: "175", weight: "70", timestamp: "2025-09-28T00:00:00Z" }
-  ],
-  shared_diet_plans: {
-    // username: [ { title, description }, ... ]
-  }
-};
-
-/*
-  اگر می‌خواهی که داده‌ها به JsonBin فرستاده شوند:
-  const JSONBIN_BIN_ID = '...';
-  const JSONBIN_API_KEY = '...';
-  در غیر این صورت این دو را خالی بذار تا فقط از EMBEDDED_BIN و localStorage استفاده شود.
-*/
-const JSONBIN_BIN_ID = '';   // اگر می‌خواهی با JsonBin سینک شود، اینجا بن آی‌دی بذار
-const JSONBIN_API_KEY = '';  // ⚠️ هرگز این را در مخزن عمومی قرار نده
-const BIN_URL = JSONBIN_BIN_ID ? `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}` : null;
-
-// helper: read local cache if exists
-function getLocalCache() {
-  try { return JSON.parse(localStorage.getItem('app_shared_bin') || 'null'); }
-  catch(e){ return null; }
-}
-function setLocalCache(obj) {
-  localStorage.setItem('app_shared_bin', JSON.stringify(obj));
-}
-
-// read: اول تلاش کن از JsonBin بخونی؛ اگر نشد، از localStorage استفاده کن؛ اگر نبود، از EMBEDDED_BIN
-async function fetchBinLatest() {
-  // اگر JsonBin تنظیم نشده، فقط از localStorage یا EMBEDDED استفاده کن
-  if (!BIN_URL || !JSONBIN_API_KEY) {
-    const cached = getLocalCache();
-    return cached ? cached : JSON.parse(JSON.stringify(EMBEDDED_BIN)); // بازگرداندن کپی
-  }
-
-  try {
-    const res = await fetch(`${BIN_URL}/latest`, { headers: { 'X-Master-Key': JSONBIN_API_KEY } });
-    if (!res.ok) throw new Error('fetch failed');
-    const j = await res.json();
-    return j.record || {};
-  } catch(err) {
-    // fallback to local cache or embedded
-    const cached = getLocalCache();
-    return cached ? cached : JSON.parse(JSON.stringify(EMBEDDED_BIN));
-  }
-}
-
-// write: اگر JsonBin تنظیم شده، PUT؛ در غیر اینصورت ذخیره در localStorage
-async function putBin(obj) {
-  // همیشه cache محلی رو هم آپدیت کن
-  setLocalCache(obj);
-
-  if (!BIN_URL || !JSONBIN_API_KEY) {
-    // no remote — done
-    return true;
-  }
-  try {
-    const res = await fetch(BIN_URL, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_API_KEY },
-      body: JSON.stringify(obj)
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(form).entries());
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      const result = await response.json();
+      if (result.success) {
+        alert('اطلاعات با موفقیت ثبت شد');
+        form.reset();
+        loadUsers();
+      } else {
+        alert('خطا در ثبت اطلاعات');
+      }
     });
-    return res.ok;
-  } catch(e) { return false; }
-}
 
-// فرم ثبت
-document.getElementById('registerForm').addEventListener('submit', async function(e){
-  e.preventDefault();
-  const username = document.getElementById('username').value.trim();
-  const password = document.getElementById('password').value.trim();
-  const age = document.getElementById('age').value;
-  const gender = document.getElementById('gender').value;
-  const height = document.getElementById('height').value;
-  const weight = document.getElementById('weight').value;
-
-  if(!/^\d{4}$/.test(password)){
-    alert('رمز باید دقیقا ۴ رقم باشد');
-    return;
-  }
-  const user = { username, password, age, gender, height, weight, timestamp:new Date().toISOString() };
-
-  document.getElementById('status').textContent = 'در حال ارسال...';
-
-  try {
-    const bin = await fetchBinLatest();
-    bin.users = bin.users || [];
-
-    if (bin.users.find(u => u.username === username)) {
-      alert('این نام کاربری قبلاً ثبت شده است');
-      document.getElementById('status').textContent = '';
-      return;
-    }
-    bin.users.push(user);
-    bin.shared_diet_plans = bin.shared_diet_plans || {};
-    const ok = await putBin(bin);
-    if (ok) {
-      document.getElementById('status').textContent = 'ثبت با موفقیت انجام شد ✅ (محلی یا بن)';
-      this.reset();
-    } else {
-      document.getElementById('status').textContent = 'خطا در ذخیره‌سازی';
-    }
-  } catch(err) {
-    console.error(err);
-    document.getElementById('status').textContent = 'خطا در ارتباط';
-  }
-});
-</script>
+    loadUsers();
+  </script>
 </body>
 </html>
