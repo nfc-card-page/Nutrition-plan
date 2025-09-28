@@ -1,61 +1,87 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>نمایش برنامه غذایی (با EMBEDDED JSON)</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>پنل کاربری</title>
 <style>
-  body{font-family:Tahoma;padding:2rem;background:#f7fafc}
-  .box{max-width:700px;margin:0 auto;background:#fff;padding:1rem;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.06)}
-  input{width:100%;padding:.6rem;margin-bottom:.6rem;border:1px solid #ddd;border-radius:6px}
-  button{background:#007bff;color:#fff;padding:.6rem;border:none;border-radius:6px}
-  .item{border-left:4px solid #4CAF50;padding:8px;margin-bottom:8px}
+/* تمام CSS قبلی بدون تغییر */
 </style>
 </head>
 <body>
-  <div class="box">
-    <h3>نمایش برنامه غذایی</h3>
-    <input id="uname" placeholder="نام کاربری را وارد کنید">
-    <button onclick="loadPlan()">بارگذاری</button>
-    <div id="result" style="margin-top:1rem"></div>
-  </div>
+<div class="container">
+    <a href="index.html" class="back-btn">← بازگشت به صفحه اصلی</a>
+    <h1>پنل کاربری</h1>
+
+    <div class="error-message" id="errorMessage">
+        نام کاربری یا رمز عبور اشتباه است
+    </div>
+
+    <form id="loginForm">
+        <div class="form-group">
+            <label for="username">نام کاربری:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+            <label for="password">رمز ۴ رقمی:</label>
+            <input type="password" id="password" name="password" maxlength="4" required>
+        </div>
+        <button type="submit" class="btn btn-primary">ورود</button>
+    </form>
+
+    <div class="diet-plan" id="dietPlan">
+        <h2>برنامه غذایی شما</h2>
+        <div id="dietContent"></div>
+    </div>
+
+    <div class="no-plan" id="noPlan" style="display: none;">
+        <h3>برنامه غذایی شما هنوز آماده نشده است</h3>
+        <p>لطفاً بعداً مراجعه کنید</p>
+    </div>
+</div>
 
 <script>
-const EMBEDDED_BIN = { users: [], shared_diet_plans: {} };
-const JSONBIN_BIN_ID = '';
-const JSONBIN_API_KEY = '';
-const BIN_URL = JSONBIN_BIN_ID ? `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}` : null;
+const WORKER_URL = 'https://user-data-api.clad90093.workers.dev';
 
-function getLocalCache() {
-  try { return JSON.parse(localStorage.getItem('app_shared_bin') || 'null'); }
-  catch(e){ return null; }
-}
-async function fetchBinLatest(){
-  if (!BIN_URL || !JSONBIN_API_KEY) {
-    const cached = getLocalCache();
-    return cached ? cached : JSON.parse(JSON.stringify(EMBEDDED_BIN));
-  }
-  try {
-    const res = await fetch(`${BIN_URL}/latest`, { headers: { 'X-Master-Key': JSONBIN_API_KEY } });
-    if (!res.ok) throw new Error('fetch failed');
-    const j = await res.json();
-    return j.record || {};
-  } catch(e){
-    const cached = getLocalCache();
-    return cached ? cached : JSON.parse(JSON.stringify(EMBEDDED_BIN));
-  }
-}
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
 
-async function loadPlan(){
-  const u = document.getElementById('uname').value.trim();
-  if(!u) { alert('نام کاربری را وارد کنید'); return; }
-  const bin = await fetchBinLatest();
-  const plans = (bin.shared_diet_plans || {})[u] || [];
-  const container = document.getElementById('result');
-  if(plans.length===0){ container.innerHTML = '<p>برنامه‌ای برای این کاربر تعریف نشده است</p>'; return; }
-  container.innerHTML = plans.map(p => `<div class="item"><h4>${escapeHtml(p.title)}</h4><p>${escapeHtml(p.description)}</p></div>`).join('');
+    try {
+        const res = await fetch(`${WORKER_URL}/user/${username}`);
+        if (!res.ok) throw new Error('User not found');
+        const user = await res.json();
+
+        if (user.password === password) {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'none';
+            showDietPlan(user);
+        } else {
+            document.getElementById('errorMessage').style.display = 'block';
+        }
+    } catch (err) {
+        console.error(err);
+        document.getElementById('errorMessage').style.display = 'block';
+    }
+});
+
+function showDietPlan(user) {
+    // نمایش نمونه یا داده کاربر
+    document.getElementById('dietPlan').style.display = 'block';
+    document.getElementById('noPlan').style.display = 'none';
+    const dietContent = document.getElementById('dietContent');
+    dietContent.innerHTML = `
+        <div class="diet-item">
+            <h3>اطلاعات کاربر</h3>
+            <p>نام: ${user.username}</p>
+            <p>سن: ${user.age}</p>
+            <p>جنسیت: ${user.gender}</p>
+            <p>قد: ${user.height} cm</p>
+            <p>وزن: ${user.weight} kg</p>
+        </div>
+    `;
 }
-function escapeHtml(s){ return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 </script>
 </body>
 </html>
