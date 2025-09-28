@@ -355,99 +355,48 @@
     </div>
 
     <script>
-        (function(){
-            // Cloudflare Workers API endpoint
-            var CLOUDFLARE_API_URL = 'https://user-data-api.clad90093.workers.dev/';
+        const API_URL = 'https://user-data-api.clad90093.workers.dev/';
+        const ADMIN_PASSWORD = '1491';
+        
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
             
-            document.getElementById('loginForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                var username = document.getElementById('username').value;
-                var password = document.getElementById('password').value;
-                
-                // Try to authenticate user
-                authenticateUser(username, password);
-            });
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
             
-            function authenticateUser(username, password) {
-                fetch(CLOUDFLARE_API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'authenticate_user',
-                        username: username,
-                        password: password
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.user) {
-                        loginSuccess(data.user);
+            try {
+                // Get all users to find matching user
+                const response = await fetch(`${API_URL}?password=${ADMIN_PASSWORD}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    const user = result.data.find(u => u.username === username && u.password === password);
+                    if (user) {
+                        loginSuccess(user);
                     } else {
                         document.getElementById('errorMessage').style.display = 'block';
                     }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
+                } else {
                     document.getElementById('errorMessage').style.display = 'block';
-                });
-            }
-            
-            function loginSuccess(user) {
-                document.getElementById('loginForm').style.display = 'none';
-                document.getElementById('errorMessage').style.display = 'none';
-                loadDietPlan(user.username);
-            }
-            
-            function loadDietPlan(username) {
-                fetch(CLOUDFLARE_API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'get_diet_plan',
-                        username: username
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.dietPlan && data.dietPlan.length > 0) {
-                        displayDietPlan(data.dietPlan);
-                    } else {
-                        document.getElementById('noPlan').style.display = 'block';
-                        document.getElementById('dietPlan').style.display = 'none';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById('noPlan').style.display = 'block';
-                    document.getElementById('dietPlan').style.display = 'none';
-                });
-            }
-            
-            function displayDietPlan(dietPlan) {
-                document.getElementById('dietPlan').style.display = 'block';
-                document.getElementById('noPlan').style.display = 'none';
-                
-                var dietContent = document.getElementById('dietContent');
-                dietContent.innerHTML = dietPlan.map(function(item) {
-                    return '<div class="diet-item"><h3>' + item.title + '</h3><p>' + item.description + '</p></div>';
-                }).join('');
-            }
-            
-            setInterval(function() {
-                var loginForm = document.getElementById('loginForm');
-                if (loginForm.style.display === 'none') {
-                    var username = document.getElementById('username').value;
-                    if (username) {
-                        loadDietPlan(username);
-                    }
                 }
-            }, 5000);
-        })();
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('errorMessage').style.display = 'block';
+            }
+        });
+        
+        function loginSuccess(user) {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'none';
+            loadDietPlan(user.username);
+        }
+        
+        function loadDietPlan(username) {
+            // For now, show a simple message
+            document.getElementById('dietPlan').style.display = 'block';
+            document.getElementById('noPlan').style.display = 'none';
+            document.getElementById('dietContent').innerHTML = '<div class="diet-item"><h3>برنامه غذایی</h3><p>برنامه غذایی شما هنوز آماده نشده است. لطفاً بعداً مراجعه کنید.</p></div>';
+        }
     </script>
 </body>
 </html>
